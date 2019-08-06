@@ -13,10 +13,21 @@
 
 # ######
 
+UD=2.2
+UD_DIR=ud-treebanks-v$UD
+
 rm uni_uni-ud-*.conllu
-for TB in $(cat language_map.csv | cut -f 1,3 -d, --output-delimiter "-")
+for L in $(cat language_map-$UD.csv)
 do
-    cat ud-treebanks-v2.4/UD_$TB/*-train*.conllu >> uni_uni-ud-train.conllu
-    cat ud-treebanks-v2.4/UD_$TB/*-dev*.conllu >> uni_uni-ud-dev.conllu
-    cat ud-treebanks-v2.4/UD_$TB/*-test*.conllu >> uni_uni-ud-test.conllu
+    #L is Finnish,fi,TDT
+    #what is the lcode?
+    TB=$(echo $L | cut -f 1,3 -d, --output-delimiter "-") #Finnish-TDT
+    LCODE=$(echo $L | cut -f 2 -d,)
+    cat $UD_DIR/UD_$TB/*-train*.conllu | python3 add_lang_code.py --lcode $LCODE >> uni_uni-ud-train-lcodes-$UD.conllu
+    cat $UD_DIR/UD_$TB/*-train*.conllu >> uni_uni-ud-train-nolcodes-$UD.conllu
+    
+    cat $UD_DIR/UD_$TB/*-dev*.conllu | python3 add_lang_code.py --lcode $LCODE >> uni_uni-ud-dev-lcodes-$UD.conllu
+    cat $UD_DIR/UD_$TB/*-dev*.conllu >> uni_uni-ud-dev-nolcodes-$UD.conllu
+    
+    cat $UD_DIR/UD_$TB/*-test*.conllu >> uni_uni-ud-test-$UD.conllu
 done
